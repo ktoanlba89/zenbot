@@ -72,7 +72,7 @@ module.exports = function container (get, set, clear) {
       }
 
       var client = publicClient()
-      client.fetchTrades(joinProduct(opts.product_id), '','', args).then(result => {
+      client.fetchTrades(joinProduct(opts.product_id), '',undefined, args).then(result => {
         var trades = result.map(function (trade) {
           return {
             trade_id: trade.id,
