@@ -34,6 +34,7 @@ module.exports = function container (get, set, clear) {
         }
         var trade_counter = 0
         var day_trade_counter = 0
+        var get_trade_retry_count = 0
         var days_left = cmd.days + 1
         var target_time, start_time
         var mode = exchange.historyScan
@@ -91,8 +92,17 @@ module.exports = function container (get, set, clear) {
                   process.exit(0)
                 }
                 else {
-                  console.error('\ngetTrades() returned no trades, --start may be too remotely in the past.')
-                  process.exit(1)
+                  if (get_trade_retry_count < 5) {
+                    console.error('\ngetTrades() returned no trades, retrying with smaller interval.')
+                    get_trade_retry_count++
+                    start_time += (target_time - start_time)*0.4
+                    setImmediate(getNext)
+                    return
+                  }
+                  else {
+                    console.error('\ngetTrades() returned no trades, --start may be too remotely in the past.')
+                    process.exit(1)
+                  }
                 }
               }
               else if (!trades.length) {
